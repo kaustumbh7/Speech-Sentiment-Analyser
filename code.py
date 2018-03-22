@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb 18 11:57:33 2018
+Created on Sun Jan 18 11:57:33 2018
 
 @author: KJ
 """
@@ -46,14 +46,14 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.linear_model import LogisticRegression
 from bs4 import BeautifulSoup
 
-# ************************************************************************
 
+# Prepocessing test data
 wordnet_lemmatizer_test = WordNetLemmatizer()
 
 # from http://www.lextek.com/manuals/onix/stopwords1.html
 stopwords = set(w.rstrip() for w in open('stopwords.txt'))
 
-
+# function to tokenize test data
 def my_tokens_test(s):
     s = s.lower() 
     tokens = nltk.tokenize.word_tokenize(s) 
@@ -63,11 +63,9 @@ def my_tokens_test(s):
     return tokens
 
 
-
 word_index_map_test = {}
 current_index_test = 0
 positive_tokenized_test = []
-
 
 
 tokens = my_tokens_test(npr)
@@ -78,7 +76,7 @@ for token in tokens:
         current_index_test += 1
 
 
-# ************************************************************************
+# Preprocessing training data 
 
 wordnet_lemmatizer = WordNetLemmatizer()
 
@@ -98,7 +96,7 @@ np.random.shuffle(positive_reviews)
 positive_reviews = positive_reviews[:len(negative_reviews)]
 
 
-
+# Function to tokenize training data 
 def my_tokens(s):
     s = s.lower() 
     tokens = nltk.tokenize.word_tokenize(s) 
@@ -106,7 +104,6 @@ def my_tokens(s):
     tokens = [wordnet_lemmatizer.lemmatize(t) for t in tokens] 
     tokens = [t for t in tokens if t not in stopwords] 
     return tokens
-
 
 
 word_index_map = {}
@@ -131,7 +128,7 @@ for review in negative_reviews:
             current_index += 1
 
 
-# function to create the input matrice 
+# function to create the training input matrice 
 def tokens_convert_vector(tokens, label):
     x = np.zeros(len(word_index_map) + 1) # last element is the label
     for t in tokens:
@@ -156,8 +153,6 @@ for tokens in negative_tokenized:
     i += 1
     
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
 # function to create the test input matrice 
 def tokens_convert_vector_test(tokens):
     x = np.zeros(len(word_index_map)+1) # last element is the label
@@ -168,7 +163,6 @@ def tokens_convert_vector_test(tokens):
     
     return x
 
-N = len(positive_tokenized) + len(negative_tokenized)
 
 data_test = np.zeros((N, len(word_index_map) + 1))
 i = 0
@@ -179,8 +173,6 @@ for tokens in positive_tokenized_test:
 
 data_test2 = data_test[:100,:-1]
   
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 np.random.shuffle(data)
 
@@ -193,12 +185,14 @@ Ytrain = Y[:-100,]
 Xtest = X[-100:,]
 Ytest = Y[-100:,]
 
+# Using Logistic Regression for Classification 
 model = LogisticRegression()
+
+# Training the model
 model.fit(Xtrain, Ytrain)
 
 
 print("Classification Rate:", model.score(data_test2, Ytest))
-
 
 
 threshold = 0.5
